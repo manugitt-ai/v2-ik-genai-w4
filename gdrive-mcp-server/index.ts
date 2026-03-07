@@ -98,7 +98,7 @@ async function readFileContent(fileId: string) {
     { responseType: "arraybuffer" },
   );
   const mimeType = file.data.mimeType || "application/octet-stream";
-  
+
   if (mimeType.startsWith("text/") || mimeType === "application/json") {
     return {
       mimeType: mimeType,
@@ -115,7 +115,7 @@ async function readFileContent(fileId: string) {
 server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
   const fileId = request.params.uri.replace("gdrive:///", "");
   const result = await readFileContent(fileId);
-  
+
   return {
     contents: [
       {
@@ -163,29 +163,36 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 });
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  fs.appendFileSync(path.join(process.cwd(), "debug.log"), `Received CallToolRequestSchema: ${JSON.stringify(request.params, null, 2)}\n`);
+  console.error("Received CallToolRequestSchema:", JSON.stringify(request.params, null, 2));
   if (request.params.name === "gdrive_search") {
     const userQuery = request.params.arguments?.query as string;
     const escapedQuery = userQuery.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
     const formattedQuery = `fullText contains '${escapedQuery}'`;
-    
-    const res = await drive.files.list({
-      q: formattedQuery,
-      pageSize: 10,
-      fields: "files(id, name, mimeType, modifiedTime, size)",
-    });
-    
-    const fileList = res.data.files
-      ?.map((file: any) => `${file.name} (${file.mimeType}) - ID: ${file.id}`)
-      .join("\n");
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Found ${res.data.files?.length ?? 0} files:\n${fileList}`,
-        },
-      ],
-      isError: false,
-    };
+
+    try {
+      const res = await drive.files.list({
+        q: formattedQuery,
+        pageSize: 10,
+        fields: "files(id, name, mimeType, modifiedTime, size)",
+      });
+
+      const fileList = res.data.files
+        ?.map((file: any) => `${file.name} (${file.mimeType}) - ID: ${file.id}`)
+        .join("\n");
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Found ${res.data.files?.length ?? 0} files:\n${fileList}`,
+          },
+        ],
+        isError: false,
+      };
+    } catch (err: any) {
+      fs.appendFileSync(path.join(process.cwd(), "debug.log"), `Drive error: ${err.message}\n${err.stack}\n`);
+      throw err;
+    }
   } else if (request.params.name === "gdrive_read_file") {
     const fileId = request.params.arguments?.file_id as string;
     if (!fileId) {
@@ -222,15 +229,15 @@ const credentialsPath = process.env.MCP_GDRIVE_CREDENTIALS || path.join(process.
 
 async function authenticateAndSaveCredentials() {
   const keyPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || path.join(process.cwd(), "credentials", "gcp-oauth.keys.json");
-  
+
   console.log("Looking for keys at:", keyPath);
   console.log("Will save credentials to:", credentialsPath);
-  
+
   const auth = await authenticate({
     keyfilePath: keyPath,
     scopes: ["https://www.googleapis.com/auth/drive.readonly"],
   });
-  
+
   fs.writeFileSync(credentialsPath, JSON.stringify(auth.credentials));
   console.log("Credentials saved. You can now run the server.");
 }
@@ -243,13 +250,24 @@ async function loadCredentialsAndRunServer() {
     process.exit(1);
   }
 
+  const keyPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || path.join(process.cwd(), "credentials", "gcp-oauth.keys.json");
+  let keys: any;
+  if (fs.existsSync(keyPath)) {
+    const rawKeys = JSON.parse(fs.readFileSync(keyPath, "utf-8"));
+    keys = rawKeys.installed || rawKeys.web;
+  }
+
   const credentials = JSON.parse(fs.readFileSync(credentialsPath, "utf-8"));
-  const auth = new google.auth.OAuth2();
+  const auth = new google.auth.OAuth2(
+    keys?.client_id,
+    keys?.client_secret,
+    keys?.redirect_uris?.[0]
+  );
   auth.setCredentials(credentials);
   google.options({ auth });
 
   const transport = new StdioServerTransport();
-  console.log("Starting Google Drive MCP server")
+  console.error("Starting Google Drive MCP server")
   await server.connect(transport);
 }
 

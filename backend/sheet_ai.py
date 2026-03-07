@@ -24,6 +24,8 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
+from langchain_core.globals import set_debug
+set_debug(True)
 
 # --- Configuration & Setup ---
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
