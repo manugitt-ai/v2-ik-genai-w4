@@ -103,6 +103,16 @@ uv pip install .
 uvicorn sheet_ai:app --host=0.0.0.0 --port=8080  --env-file=../.env
 ```
 
+### Start NGROK tunnel
+
+NGrok is needed because IPs on vercel are dynamic (static IPs are paid feature). So, we can use a tunnel, where ngrok comes in.
+
+To install ngrok:
+```
+curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc   | tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null   && echo "deb https:/
+/ngrok-agent.s3.amazonaws.com bookworm main"   | tee /etc/apt/sources.list.d/ngrok.list   && apt update   && apt install ngrok
+```
+
 ### MCP Inspector
 
 MCP inspector is a debugging tool that uses model-context-protocol to connect to your server. You can use it to ensure your MCP server is up and working correctly.

@@ -24,6 +24,11 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
+
+# Enable LangSmith debugging/tracing
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_PROJECT"] = os.environ.get("LANGCHAIN_PROJECT", "sheet_ai_backend")
+
 from langchain_core.globals import set_debug
 set_debug(True)
 
