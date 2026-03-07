@@ -27,3 +27,6 @@ uv.lock
 
 #build artifacts
 archive.*
+
+#pem
+*.pem

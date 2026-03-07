@@ -5,6 +5,14 @@ This is the Interview-Kickstart GenAI Week-4 exercise.
 
 Run these commands to setup the box for the build.
 
+First, copy '.env.example' to '.env' 
+```
+cp .env.example .env
+```
+
+Copy your openrouter key to 'OPENAI_API_KEY'
+
+#### Build the server
 ```
 cd gdrive-mcp-server
 npm install && npm run build
@@ -12,6 +20,7 @@ mkdir .credentials
 ```
 
 Copy (Drag and drop) the `gcp_oauth_keys.json` file, that was obtained from GCP (rename if necessary) into the newly created `.credentials` directory.
+
 
 Based on these credentials, we will now obtain a fresh auth token from Google:
 ```
@@ -28,7 +37,7 @@ For e.g. if the redirect URL from google is: https://localhost:3000/jkasjdkajslk
 - and the port (shown in ports tab) while the command 'node --env-file=../.env dist/index.js auth' is still running is `33445`
 Then, replace 'http://localhost:3000/' with 'https://urban-couscous-v99v666w96fx9vg-33445.app.github.dev/', and hit enter.
 
-It should now authenticate, and write a file '.gdrive-server-credentials.json' to your credentials folder.
+It should now authenticate showing `Authentication successful! Please return to the console.` on the webpage. It will write a new file '.gdrive-server-credentials.json' to your credentials folder.
 
 As the last step, create the .zip artifact
 
