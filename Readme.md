@@ -65,6 +65,5 @@ cd ~/repo/ik-genai-w4/backend
 uv venv .venv
 source .venv/bin/activate
 uv pip install .
-uvicorn sheet_ai:app --host=0.0.0.0 --port=8080
+uvicorn sheet_ai:app --host=0.0.0.0 --port=8080  --env-file=../.env
 ```
-
