@@ -46,7 +46,7 @@ llm = ChatOpenAI(
 # This tells the agent how to start the GDrive MCP server (Node.js), with necessary credential paths
 server_params = StdioServerParameters(
     command="node",
-    args=["/workspace/app/gdrive-mcp-server/dist/index.js"],
+    args=["../gdrive-mcp-server/dist/index.js"],
     env={
         "GOOGLE_APPLICATION_CREDENTIALS": os.environ["GOOGLE_APPLICATION_CREDENTIALS"],
         "MCP_GDRIVE_CREDENTIALS": os.environ["MCP_GDRIVE_CREDENTIALS"]

@@ -1,6 +1,20 @@
 # Introduction
 This is the Interview-Kickstart GenAI Week-4 exercise.
 
+#### Create EC2 box on AWS
+- Create a new EC2 instance (debian t3.small 80GB).
+- Create new rule and add port 8080 to incoming security group.
+- Download the .pem file from security tab, and name it `backend.pem`.
+- Keep the 'Public DNS' copied from 'details' of the EC2 instance, somewhere safe for later use.
+
+#### Create a codespace or clone to local
+You have two options, either local or github codespace VM.
+1. Local
+Create a clone of the repository `git clone https://github.com/manupatet/ik-genai-w4.git` and open in VSCode using devcontainer. This will create the VM with all requisite installs.
+
+2. Github Codespaces
+Initite a github codespace from Code -> codespace -> new-with-options -> IK-GenAI-W4
+
 ### Building .zip artifact
 
 Run these commands to setup the box for the build.
@@ -46,26 +60,38 @@ cd /workspace/app
 tar -cf archive.tar ./gdrive-mcp-server
 ```
 
-### Backend : EC2 instance
+### Setup backend on EC2
 
-Over on the EC2 machine, first clone the repo:
-
+On your VM (local or codespaces) copy the backend.pem file to the root folder.
+The run the following commands to connect to the (substitute with your public amazon DNS):
 ```
-cd ~/
-mkdir repo
+chmod 400 ./backend-pem.pem
+scp -i backend.pem archive.tar admin@ec2-52-91-249-145.compute-1.amazonaws.com:~/
+scp -i backend.pem .env admin@ec2-52-91-249-145.compute-1.amazonaws.com:~/
+```
+
+*The artifacts and the token have now been copied to EC2 box.*
+
+- Open a new terminal and run:
+```
+ssh -i ./backend-pem.pem admin@ec2-52-91-249-145.compute-1.amazonaws.com
+
+sudo apt update && sudo apt install git npm
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.local/bin/env
+mkdir repo/
 cd repo
 git clone https://github.com/manupatet/ik-genai-w4.git
 cd ik-genai-w4
 ```
 
-Now `untar` the archive.tar in the root directory of the github repository, so that the build files are correctly laid out.
-- Remove the `gdrive-mcp-server` folder from the downloaded github repo and unzip the file in its place:
+First remove `gdrive-mcp-server` directory and then `untar` the archive.tar :
 ```
-rm -rf ~/repo/ik-genai-w4/gdrive-mcp-server/
-tar -xf archive.tar
+rm -rf gdrive-mcp-server/
+tar -xf ~/archive.tar
 ```
 
-Copy the `.env` file over from the build to directory `~/repo/ik-genai-w4/`
+Copy the `.env` file over from the build to project root directory: `cp ~/.env .`
 
 #### Prepare the backend server to run:
 
