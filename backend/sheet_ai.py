@@ -11,8 +11,8 @@ from langchain_mcp_adapters.tools import load_mcp_tools
 from langgraph.prebuilt import create_react_agent
 
 # LLM interface from LangChain
-# from langchain_openai import ChatOpenAI
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
+#from langchain_google_genai import ChatGoogleGenerativeAI
 # Python utilities
 import asyncio
 from contextlib import asynccontextmanager
@@ -26,21 +26,27 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- Configuration & Setup ---
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 # Initialize LLM (you'll need to set OPENAI_API_KEY environment variable)
 #llm = ChatOpenAI(model="gpt-4o")
-llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash-lite",
-        google_api_key=GEMINI_API_KEY,
-        temperature=0.8
-    )
+llm = ChatOpenAI(
+    openai_api_base="https://openrouter.ai/api/v1",
+    model= "nvidia/nemotron-nano-9b-v2:free",#"arcee-ai/trinity-mini:free",
+    temperature=0.4
+)
+
+#llm = ChatGoogleGenerativeAI(
+#        model="gemini-2.5-flash-lite",
+#        google_api_key=GEMINI_API_KEY,
+#        temperature=0.8
+#    )
 
 # === 2. Configure MCP server parameters ===
 # This tells the agent how to start the GDrive MCP server (Node.js), with necessary credential paths
 server_params = StdioServerParameters(
     command="node",
-    args=["../gdrive-mcp-server/dist/index.js"],
+    args=["/workspace/app/gdrive-mcp-server/dist/index.js"],
     env={
         "GOOGLE_APPLICATION_CREDENTIALS": os.environ["GOOGLE_APPLICATION_CREDENTIALS"],
         "MCP_GDRIVE_CREDENTIALS": os.environ["MCP_GDRIVE_CREDENTIALS"]
@@ -63,9 +69,9 @@ async def create_agent():
             agent = create_react_agent(llm, tools)
             
             # OPTIONAL: dry-run test query to check if things work
-            agent_response = await agent.ainvoke({"messages": "What is the name of my Drive file about diet"})
+            agent_response = await agent.ainvoke({"messages": "What is the name of my Drive file about readme.md"})
 
-            print("TEST response: ",agent_response)
+            print("TEST response: ", agent_response)
             return agent
             # agent_response = await agent.ainvoke({"messages": "What is the name of my Drive file about diet"})
             # return agent_response
