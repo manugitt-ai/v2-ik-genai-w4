@@ -102,3 +102,22 @@ source .venv/bin/activate
 uv pip install .
 uvicorn sheet_ai:app --host=0.0.0.0 --port=8080  --env-file=../.env
 ```
+
+### MCP Inspector
+
+MCP inspector is a debugging tool that uses model-context-protocol to connect to your server. You can use it to ensure your MCP server is up and working correctly.
+
+To invoke MCP inspector tool from EC2 box, ports 6274 and 6277 need to be opened on Security-Group.
+
+Then run command:
+```
+ALLOWED_ORIGINS=http://ec2-52-91-249-145.compute-1.amazonaws.com:6274 HOST=0.0.0.0 CLIENT_PORT=6274 SERVER_PORT=6277 npx @modelcontextprotocol/inspector
+```
+
+Open a new tab with url: http://ec2-52-91-249-145.compute-1.amazonaws.com:6274. This will open the MCP inspector tool hosted on the EC2 box.
+
+To connect it to your MCP server:
+- Command: `node`
+- Argument: `--env-file=../.env dist/index.js`
+- Config -> Proxy Address: `http://ec2-52-91-249-145.compute-1.amazonaws.com:6277`
+- Config -> Token: `<token-shown-on-console>`
