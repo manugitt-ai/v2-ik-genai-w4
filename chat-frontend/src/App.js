@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Trash2, Clock } from 'lucide-react';
 
-const ngrokURL="https://29b6ce5086bd.ngrok-free.app"
+const ngrokURL = process.env.REACT_APP_BACKEND_URL || process.env.BACKEND_URL;
 //const ngrokURL="http://ec2-54-81-28-21.compute-1.amazonaws.com:8080"
 
 const ChatAssistant = () => {
@@ -48,7 +48,7 @@ const ChatAssistant = () => {
       }
 
       const data = await response.json();
-      
+
       const botMessage = {
         id: Date.now() + 1,
         text: data.response,
@@ -137,18 +137,16 @@ const ChatAssistant = () => {
             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`flex items-start space-x-3 max-w-xs lg:max-w-md ${
-                message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
-              }`}
+              className={`flex items-start space-x-3 max-w-xs lg:max-w-md ${message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
+                }`}
             >
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  message.sender === 'user'
+                className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.sender === 'user'
                     ? 'bg-blue-600'
                     : message.isError
-                    ? 'bg-red-600'
-                    : 'bg-gray-600'
-                }`}
+                      ? 'bg-red-600'
+                      : 'bg-gray-600'
+                  }`}
               >
                 {message.sender === 'user' ? (
                   <User className="w-4 h-4 text-white" />
@@ -157,13 +155,12 @@ const ChatAssistant = () => {
                 )}
               </div>
               <div
-                className={`rounded-lg p-3 ${
-                  message.sender === 'user'
+                className={`rounded-lg p-3 ${message.sender === 'user'
                     ? 'bg-blue-600 text-white'
                     : message.isError
-                    ? 'bg-red-100 text-red-800 border border-red-200'
-                    : 'bg-white text-gray-900 border border-gray-200'
-                }`}
+                      ? 'bg-red-100 text-red-800 border border-red-200'
+                      : 'bg-white text-gray-900 border border-gray-200'
+                  }`}
               >
                 <p className="text-sm whitespace-pre-wrap">{message.text}</p>
                 <div className="flex items-center mt-1 space-x-1">
