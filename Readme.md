@@ -1,5 +1,5 @@
 # Introduction
-This is the Interview-Kickstart GenAI Week-4 exercise.
+This is the coding-exercise for Interview-Kickstart's GenAI  Week-4 class.
 
 #### Create EC2 box on AWS
 - Create a new EC2 instance (debian t3.small 80GB).
