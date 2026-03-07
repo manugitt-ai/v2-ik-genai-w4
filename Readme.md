@@ -109,8 +109,16 @@ NGrok is needed because IPs on vercel are dynamic (static IPs are paid feature).
 
 To install ngrok:
 ```
-curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc   | tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null   && echo "deb https:/
-/ngrok-agent.s3.amazonaws.com bookworm main"   | tee /etc/apt/sources.list.d/ngrok.list   && apt update   && apt install ngrok
+curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
+  | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null \
+  && echo "deb https://ngrok-agent.s3.amazonaws.com bookworm main" \
+  | sudo tee /etc/apt/sources.list.d/ngrok.list \
+  && sudo apt update \
+  && sudo apt install ngrok
+
+ngrok config add-authtoken <your-token>
+
+ngrok http 8080
 ```
 
 ### MCP Inspector
