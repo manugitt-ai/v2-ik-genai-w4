@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Trash2, Clock } from 'lucide-react';
 
-const ngrokURL = process.env.REACT_APP_BACKEND_URL || process.env.BACKEND_URL;
-//const ngrokURL="http://ec2-54-81-28-21.compute-1.amazonaws.com:8080"
+const ngrokURL = process.env.REACT_APP_BACKEND_URL; //https://5e07-54-197-116-37.ngrok-free.app
 
 const ChatAssistant = () => {
   const [messages, setMessages] = useState([]);
@@ -78,6 +77,7 @@ const ChatAssistant = () => {
         method: 'DELETE',
       });
       setMessages([]);
+      window.location.reload();
     } catch (error) {
       console.error('Error clearing chat:', error);
     }
@@ -100,8 +100,8 @@ const ChatAssistant = () => {
               <Bot className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">AI Chat Assistant</h1>
-              <p className="text-sm text-gray-500">Powered by LangChain & FastAPI</p>
+              <h1 className="text-xl font-semibold text-gray-900">Google Drive Assistant</h1>
+              <p className="text-sm text-gray-500">Powered by LangChain, MCP & FastAPI</p>
             </div>
           </div>
           <button
@@ -212,7 +212,7 @@ const ChatAssistant = () => {
           </button>
         </div>
         <p className="text-xs text-gray-500 mt-2">
-          Try asking: "What's the weather in New York?", "Calculate 15 * 23", or "What time is it?"
+          Try asking: "What files do you have?" OR "show me '1UqBg9iIx5jqdhf7NDxEM_U'"
         </p>
       </div>
     </div>
