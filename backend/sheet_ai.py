@@ -39,9 +39,20 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 #llm = ChatOpenAI(model="gpt-4o")
 llm = ChatOpenAI(
     openai_api_base="https://openrouter.ai/api/v1",
-    model= "nvidia/nemotron-nano-9b-v2:free",#"arcee-ai/trinity-mini:free",
+    # model= "nvidia/nemotron-nano-9b-v2:free",#"arcee-ai/trinity-mini:free",
+    model= "google/gemini-2.5-flash:free",
     temperature=0.4
 )
+
+# Define the persona once globally
+YOUTUBE_AGENT_PROMPT = (
+    "You are a specialized YouTube video analysis assistant. "
+    "You have access to a tool that can fetch transcripts from YouTube videos. "
+    "When a user asks about a video, ALWAYS use the tool to retrieve the transcript first, "
+    "then answer their question based strictly on the video's contents."
+)
+
+sessions = {}
 
 #llm = ChatGoogleGenerativeAI(
 #        model="gemini-2.5-flash-lite",
@@ -51,37 +62,37 @@ llm = ChatOpenAI(
 
 # === 2. Configure MCP server parameters ===
 # This tells the agent how to start the GDrive MCP server (Node.js), with necessary credential paths
+# server_params = StdioServerParameters(
+#     command="node",
+#     args=["../gdrive-mcp-server/dist/index.js"],
+#     env={
+#         "GOOGLE_APPLICATION_CREDENTIALS": os.environ["GOOGLE_APPLICATION_CREDENTIALS"],
+#         "MCP_GDRIVE_CREDENTIALS": os.environ["MCP_GDRIVE_CREDENTIALS"]
+#     }
+# )
+
 server_params = StdioServerParameters(
-    command="node",
-    args=["../gdrive-mcp-server/dist/index.js"],
-    env={
-        "GOOGLE_APPLICATION_CREDENTIALS": os.environ["GOOGLE_APPLICATION_CREDENTIALS"],
-        "MCP_GDRIVE_CREDENTIALS": os.environ["MCP_GDRIVE_CREDENTIALS"]
-    }
+    command="npx",
+    args=["-y", "@anaisbetts/mcp-youtube"]
 )
 
 # === 3. Create the MCP agent asynchronously ===
 async def create_agent():
-    # Open a stdio connection to the MCP server
     async with stdio_client(server_params) as (read, write):
-        # Wrap the connection in a client session
         async with ClientSession(read, write) as session:
-            # Handshake between client and server
             await session.initialize() 
 
-            # Dynamically load the list of tools (e.g., search, summarize)
             tools = await load_mcp_tools(session)
 
-            # Create a LangGraph ReAct agent using the LLM and tools
-            agent = create_react_agent(llm, tools)
+            # UPDATE THIS: Pass the system prompt via state_modifier
+            agent = create_react_agent(llm, tools, state_modifier=YOUTUBE_AGENT_PROMPT)
             
-            # OPTIONAL: dry-run test query to check if things work
-            agent_response = await agent.ainvoke({"messages": "What is the name of my Drive file about readme.md"})
+            # UPDATE THIS: Change the dry-run to test a public YouTube video
+            print("Running dry-run test...")
+            agent_response = await agent.ainvoke({"messages": "What is the main topic of this video? https://www.youtube.com/watch?v=jNQXAC9IVRw"})
 
-            print("TEST response: ", agent_response)
+            print("TEST response: ", agent_response["messages"][-1].content)
             return agent
-            # agent_response = await agent.ainvoke({"messages": "What is the name of my Drive file about diet"})
-            # return agent_response
 
 # === 4. FastAPI app startup (lifespan) ===
 @asynccontextmanager
@@ -133,7 +144,8 @@ async def chat(request: ChatRequest):
                 tools = await load_mcp_tools(session)
 
                 # Create agent with tools and LLM
-                agent = create_react_agent(llm, tools)
+                # agent = create_react_agent(llm, tools)
+                agent = create_react_agent(llm, tools, state_modifier=YOUTUBE_AGENT_PROMPT)
 
                 # Call the agent with the user's message
                 agent_response = await agent.ainvoke({"messages": request.message})
