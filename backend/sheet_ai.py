@@ -73,7 +73,8 @@ sessions = {}
 
 server_params = StdioServerParameters(
     command="npx",
-    args=["-y", "@anaisbetts/mcp-youtube"]
+    args=["-y", "@supadata/mcp"],
+    env=dict(os.environ) # This ensures the Node process inherits your SUPADATA_API_KEY
 )
 
 # === 3. Create the MCP agent asynchronously ===
