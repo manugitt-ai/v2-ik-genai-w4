@@ -39,8 +39,8 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 #llm = ChatOpenAI(model="gpt-4o")
 llm = ChatOpenAI(
     openai_api_base="https://openrouter.ai/api/v1",
-    # model= "nvidia/nemotron-nano-9b-v2:free",#"arcee-ai/trinity-mini:free",
-    model= "meta-llama/llama-3.3-70b-instruct:free",
+    model= "nvidia/nemotron-nano-9b-v2:free",#"arcee-ai/trinity-mini:free",
+    # model= "meta-llama/llama-3.3-70b-instruct:free",
     temperature=0.4
 )
 
