@@ -85,7 +85,7 @@ async def create_agent():
             tools = await load_mcp_tools(session)
 
             # UPDATE THIS: Pass the system prompt via state_modifier
-            agent = create_react_agent(llm, tools, state_modifier=YOUTUBE_AGENT_PROMPT)
+            agent = create_react_agent(llm, tools, prompt=YOUTUBE_AGENT_PROMPT)
             
             # UPDATE THIS: Change the dry-run to test a public YouTube video
             print("Running dry-run test...")
