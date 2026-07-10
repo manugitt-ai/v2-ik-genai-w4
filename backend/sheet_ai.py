@@ -145,7 +145,7 @@ async def chat(request: ChatRequest):
 
                 # Create agent with tools and LLM
                 # agent = create_react_agent(llm, tools)
-                agent = create_react_agent(llm, tools, state_modifier=YOUTUBE_AGENT_PROMPT)
+                agent = create_react_agent(llm, tools, prompt=YOUTUBE_AGENT_PROMPT)
 
                 # Call the agent with the user's message
                 agent_response = await agent.ainvoke({"messages": request.message})
