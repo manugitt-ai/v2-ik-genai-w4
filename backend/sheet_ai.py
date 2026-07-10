@@ -39,8 +39,8 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 #llm = ChatOpenAI(model="gpt-4o")
 llm = ChatOpenAI(
     openai_api_base="https://openrouter.ai/api/v1",
-    # model= "nvidia/nemotron-nano-9b-v2:free",#"arcee-ai/trinity-mini:free",
-    model= "google/gemini-2.5-flash:free",
+    model= "nvidia/nemotron-nano-9b-v2:free",#"arcee-ai/trinity-mini:free",
+    # model= "meta-llama/llama-3.3-70b-instruct:free",
     temperature=0.4
 )
 
@@ -85,7 +85,7 @@ async def create_agent():
             tools = await load_mcp_tools(session)
 
             # UPDATE THIS: Pass the system prompt via state_modifier
-            agent = create_react_agent(llm, tools, state_modifier=YOUTUBE_AGENT_PROMPT)
+            agent = create_react_agent(llm, tools, prompt=YOUTUBE_AGENT_PROMPT)
             
             # UPDATE THIS: Change the dry-run to test a public YouTube video
             print("Running dry-run test...")
